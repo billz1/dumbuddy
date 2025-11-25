@@ -64,12 +64,11 @@ export default function MultiHomePage() {
       <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl shadow-black/40 p-6 sm:p-8 space-y-6">
         <header className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Tell Me True — Shared Deck
+            dümBuddy — Shared Deck
           </h1>
           <p className="text-sm text-slate-300">
             Host a shared deck so everyone at the table can open the same game
-            on their own phone. One host controls the cards, everyone watches,
-            answers, and feels like you&apos;re holding a physical deck.
+            on their phone. One host controls the cards, everyone plays.
           </p>
         </header>
 

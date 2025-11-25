@@ -1,2 +1,2 @@
 # dumbuddy
-a fun game for friends
+A modern, consent-focused intimacy game. Draw a card, answer honestly, always respect boundaries.

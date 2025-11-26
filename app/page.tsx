@@ -187,7 +187,7 @@ export default function HomePage() {
                 <span className="text-brand-400"> — Friendsgiving Edition</span>
               </h1>
               <p className="text-sm sm:text-base text-slate-300 mt-1">
-                An AI-powered, consent-first intimacy game for adults 18+. Fresh questions every round.
+                Smash the ice!
               </p>
             </div>
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/10 border border-brand-500/60 px-3 py-1 text-xs font-medium text-brand-100">
@@ -240,7 +240,7 @@ export default function HomePage() {
           <footer className="pt-4 border-t border-slate-800 mt-4">
             <p className="text-[11px] text-slate-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
               <span>
-                Questions are generated live by AI with strict consent & safety rules. No explicit content.
+                
               </span>
               <span className="flex items-center gap-3">
                 <a

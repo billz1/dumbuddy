@@ -169,14 +169,14 @@ export default function SetupScreen({
             })}
           </div>
           <p className="text-[11px] text-slate-500">
-            This tells the AI how deep to go emotionally: from playful to very
+            How deep to go emotionally: from playful to very
             vulnerable.
           </p>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
-            Extras (for future use)
+            Extras 
           </h3>
           <label className="flex items-center gap-2 text-xs">
             <input
@@ -185,7 +185,7 @@ export default function SetupScreen({
               onChange={toggleWildcards}
               className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-brand-500 focus:ring-brand-500"
             />
-            <span>Wildcards (AI-only deck ignores these for now)</span>
+            <span>Wildcards (Smash the ice!)</span>
           </label>
           <label className="flex items-center gap-2 text-xs">
             <input
@@ -194,7 +194,7 @@ export default function SetupScreen({
               onChange={toggleGoDeeper}
               className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-brand-500 focus:ring-brand-500"
             />
-            <span>“Go Deeper” prompts (AI can approximate this via level)</span>
+            <span>“Go Deeper” prompts(A push to open up, go beneath the surface, and say the real thing.)</span>
           </label>
         </div>
       </div>
@@ -229,8 +229,7 @@ export default function SetupScreen({
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
           />
           <p className="text-[11px] text-slate-500">
-            The AI will steer questions toward this mood, while staying
-            consent-first and non-explicit.
+            Steer questions toward this mood.
           </p>
         </div>
       </div>

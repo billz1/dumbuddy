@@ -83,8 +83,8 @@ export default function MultiHomePage() {
             dümBuddy — Shared Deck
           </h1>
           <p className="text-sm text-slate-300">
-            Host a shared AI-powered deck so everyone at the table can open the
-            same game on their phone. One host controls the cards, everyone plays.
+            Host a shared deck so everyone at the table can join the
+            same game. One host controls the cards, everyone plays.
           </p>
         </header>
 
@@ -101,8 +101,7 @@ export default function MultiHomePage() {
               className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
             <p className="text-xs text-slate-500">
-              This name will appear as a player in the room so you don&apos;t
-              have to join again later.
+              This name will appear as your username in the room.
             </p>
           </div>
 
@@ -136,7 +135,7 @@ export default function MultiHomePage() {
               })}
             </div>
             <p className="text-[11px] text-slate-500">
-              This tells the AI how deep to go emotionally: from playful to very
+              How deep to go emotionally: from playful to very
               vulnerable.
             </p>
           </div>
@@ -171,7 +170,7 @@ export default function MultiHomePage() {
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
               />
               <p className="text-[11px] text-slate-500">
-                The AI will steer questions toward this mood while staying consent-first and non-explicit.
+                Steer questions toward this mood.
               </p>
             </div>
           </div>
@@ -192,7 +191,7 @@ export default function MultiHomePage() {
                 }
                 className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-brand-500 focus:ring-brand-500"
               />
-              <span>Include wildcards (for future modes)</span>
+              <span>Include Wildcards (Smash the ice!)</span>
             </label>
             <label className="flex items-center gap-2 text-xs">
               <input
@@ -206,7 +205,7 @@ export default function MultiHomePage() {
                 }
                 className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-brand-500 focus:ring-brand-500"
               />
-              <span>Include “Go Deeper” prompts</span>
+              <span>Include “Go Deeper” prompts(A push to open up, go beneath the surface, and say the real thing.)</span>
             </label>
           </div>
 
@@ -225,8 +224,7 @@ export default function MultiHomePage() {
             Join existing room
           </h2>
           <p className="text-xs text-slate-400">
-            If someone already created a room, enter the code they see on their
-            screen.
+            If someone has already created a room, enter the room code.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-md">
             <input

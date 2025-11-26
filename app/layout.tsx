@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "dümBuddy — Friendsgiving Edition",
   description:
-    "A consent-first intimacy card game for adults 18+. Deep questions, clear boundaries, real connection.",
+    "No.1 party game for adults 18+. Deep questions, clear boundaries, real connection.",
   applicationName: "dümBuddy",
   icons: {
     icon: "/favicon.ico",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "dümBuddy — Live at Aidan's",
     description:
-      "A modern, consent-focused intimacy game. Draw a card, answer honestly, always respect boundaries.",
+      "Skip the bullshit. Draw a card, answer honestly, always respect boundaries.",
     type: "website",
   },
 };

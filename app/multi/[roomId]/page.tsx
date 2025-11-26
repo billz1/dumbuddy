@@ -242,11 +242,13 @@ export default function MultiRoomPage({ params }: Props) {
             <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">
               Shared Deck — Room {state.roomId}
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1">
-              Everyone at the table opens this room on their phone. One host
-              draws cards, everyone answers out loud — just like a physical
-              deck.
-            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/multi")}
+              className="mt-2 inline-flex items-center justify-center rounded-2xl bg-brand-500 hover:bg-brand-400 px-4 py-2 text-xs font-semibold text-white"
+            >
+              ⟵ Change setup
+            </button>
           </div>
           <div className="flex flex-col items-end gap-1 text-right">
             {currentPlayer ? (

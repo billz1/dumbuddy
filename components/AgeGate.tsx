@@ -53,8 +53,7 @@ export default function AgeGate({ onConfirm }: AgeGateProps) {
       </button>
 
       <p className="text-xs text-slate-500 pt-3 border-t border-slate-800">
-        This web app is for entertainment and connection only. It does not
-        provide therapy, legal, or medical advice.
+        You have been saved from small talk.
       </p>
     </section>
   );

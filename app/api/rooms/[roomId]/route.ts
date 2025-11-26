@@ -42,7 +42,7 @@ export async function POST(
       return NextResponse.json(toPublicRoomState(room));
     }
 
-    const room = applyRoomAction(roomId, body.hostKey, body.action);
+    const room = await applyRoomAction(roomId, body.hostKey, body.action);
     if (!room) {
       return new NextResponse("Room not found", { status: 404 });
     }

@@ -1,5 +1,6 @@
 import type { GameConfig, Card, HistoryItem } from "./gameTypes";
 import { buildDeck } from "./deck";
+import { generateAIQuestions } from "./aiQuestions";
 
 export interface RoomPlayer {
   id: string;
@@ -18,9 +19,18 @@ export interface RoomState {
   players: RoomPlayer[];
   currentPlayerIndex: number;
   history: HistoryItem[];
+  // AI metadata (optional)
+  questionCount?: number;
+  theme?: string;
+  useAI?: boolean;
 }
 
 const rooms = new Map<string, RoomState>();
+
+export function getRoom(roomId: string): RoomState | undefined {
+  return rooms.get(roomId);
+}
+
 
 function randomId(length = 6): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -39,10 +49,14 @@ function randomPlayerId(): string {
   return Math.random().toString(16).slice(2, 10);
 }
 
-export function createRoom(config: GameConfig, hostName?: string): RoomState {
+export function createRoom(
+  config: GameConfig,
+  hostName?: string,
+  options?: { deck?: Card[]; questionCount?: number; theme?: string; useAI?: boolean }
+): RoomState {
   const roomId = randomId();
   const hostKey = randomHostKey();
-  const deck = buildDeck(config);
+  const deck = options?.deck ?? buildDeck(config);
   const now = Date.now();
   const players: RoomPlayer[] = [];
 
@@ -65,22 +79,21 @@ export function createRoom(config: GameConfig, hostName?: string): RoomState {
     players,
     currentPlayerIndex: 0,
     history: [],
+    questionCount: options?.questionCount ?? deck.length,
+    theme: options?.theme,
+    useAI: !!options?.useAI,
   };
   rooms.set(roomId, state);
   return state;
 }
 
-export function getRoom(roomId: string): RoomState | undefined {
-  return rooms.get(roomId);
-}
-
 export type RoomAction = "draw" | "reset";
 
-export function applyRoomAction(
+export async function applyRoomAction(
   roomId: string,
   hostKey: string,
   action: RoomAction
-): RoomState | undefined {
+): Promise<RoomState | undefined> {
   const room = rooms.get(roomId);
   if (!room) return undefined;
   if (room.hostKey !== hostKey) {
@@ -117,6 +130,34 @@ export function applyRoomAction(
     room.currentCardIndex = -1;
     room.history = [];
     room.updatedAt = now;
+
+    // Regenerate deck when using AI, otherwise rebuild static deck
+    if (room.useAI) {
+      const levelParam =
+        room.config.mode === "mixed"
+          ? "mixed"
+          : (Number(room.config.mode) as 1 | 2 | 3);
+      const count = room.questionCount ?? room.deck.length;
+      try {
+        const newDeck = await generateAIQuestions({
+          count,
+          level: levelParam,
+          theme: room.theme,
+        });
+        if (newDeck.length) {
+          room.deck = newDeck;
+        } else {
+          // fallback: keep existing deck
+          room.deck = room.deck;
+        }
+      } catch (err) {
+        console.error("Failed to regenerate AI deck on reset:", err);
+        // keep existing deck as a fallback
+        room.deck = room.deck;
+      }
+    } else {
+      room.deck = buildDeck(room.config);
+    }
   }
 
   return room;
@@ -168,6 +209,10 @@ export interface PublicRoomState {
   players: RoomPlayer[];
   currentPlayerIndex: number;
   history: HistoryItem[];
+  // AI metadata (optional)
+  questionCount?: number;
+  theme?: string;
+  useAI?: boolean;
 }
 
 export function toPublicRoomState(room: RoomState): PublicRoomState {
@@ -192,5 +237,9 @@ export function toPublicRoomState(room: RoomState): PublicRoomState {
     players: room.players,
     currentPlayerIndex: room.currentPlayerIndex,
     history: room.history,
+    questionCount: room.questionCount,
+    theme: room.theme,
+    useAI: room.useAI,
   };
 }
+

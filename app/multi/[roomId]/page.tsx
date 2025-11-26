@@ -270,9 +270,17 @@ export default function MultiRoomPage({ params }: Props) {
                 ? "Level 2 only"
                 : "Level 3 only"}
             </p>
-            <p className="text-[11px] text-slate-500">
-              {state.remainingCards} of {state.totalCards} cards remaining
-            </p>
+<p className="text-[11px] text-slate-500">
+  {state.remainingCards} of {state.totalCards} cards remaining
+</p>
+{state.theme && (
+  <p className="text-[11px] text-slate-500">
+    Theme: <span className="italic">{state.theme}</span>{" "}
+    {state.questionCount
+      ? `(AI deck, ${state.questionCount} cards)`
+      : "(AI deck)"}
+  </p>
+)}
             {isHost ? (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/15 border border-brand-500/60 text-brand-100">
                 You are the host

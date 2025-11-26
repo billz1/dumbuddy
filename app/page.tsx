@@ -3,11 +3,18 @@
 import AgeGate from "@/components/AgeGate";
 import SetupScreen from "@/components/SetupScreen";
 import GameScreen from "@/components/GameScreen";
-import type { GameConfig, HistoryItem } from "@/lib/gameTypes";
-import { buildDeck } from "@/lib/deck";
-import type { Card } from "@/lib/gameTypes";
+import type { GameConfig, HistoryItem, Card } from "@/lib/gameTypes";
 import { useEffect, useState } from "react";
 import { addEvent } from "@/lib/analytics";
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export default function HomePage() {
   const [ageConfirmed, setAgeConfirmed] = useState(false);
@@ -21,11 +28,14 @@ export default function HomePage() {
     includeGoDeeper: true,
   });
 
+  const [questionCount, setQuestionCount] = useState<number>(20);
+  const [theme, setTheme] = useState<string>("");
+
   const [deck, setDeck] = useState<Card[]>([]);
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  // Restore last players/config
+  // Restore last players/config/basic preferences
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = window.localStorage.getItem("tmt_session_v1");
@@ -34,10 +44,20 @@ export default function HomePage() {
       const parsed = JSON.parse(saved) as {
         players: string[];
         config: GameConfig;
+        questionCount?: number;
+        theme?: string;
       };
       if (parsed.players?.length) {
         setPlayers(parsed.players);
+      }
+      if (parsed.config) {
         setConfig(parsed.config);
+      }
+      if (typeof parsed.questionCount === "number") {
+        setQuestionCount(parsed.questionCount);
+      }
+      if (typeof parsed.theme === "string") {
+        setTheme(parsed.theme);
       }
     } catch {
       // ignore
@@ -48,22 +68,62 @@ export default function HomePage() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(
       "tmt_session_v1",
-      JSON.stringify({ players, config })
+      JSON.stringify({ players, config, questionCount, theme })
     );
-  }, [players, config]);
+  }, [players, config, questionCount, theme]);
 
-  const startGame = () => {
+  const startGame = async () => {
     if (!players.length) return;
-    const newDeck = buildDeck(config);
-    setDeck(newDeck);
+
+    const levelParam =
+      config.mode === "mixed"
+        ? "mixed"
+        : (Number(config.mode) as 1 | 2 | 3);
+
+    let aiDeck: Card[] = [];
+    try {
+      const res = await fetch("/api/ai-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          count: questionCount,
+          level: levelParam,
+          theme: theme || undefined,
+        }),
+      });
+
+      if (res.ok) {
+        const json = (await res.json()) as { cards: Card[] };
+        if (Array.isArray(json.cards)) {
+          aiDeck = json.cards;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to get AI deck", e);
+    }
+
+    if (!aiDeck.length) {
+      alert(
+        "Could not generate questions from AI right now. Please try again in a moment."
+      );
+      return;
+    }
+
+    aiDeck = shuffle(aiDeck);
+
+    setDeck(aiDeck);
     setCurrentCard(null);
     setHistory([]);
     setCurrentPlayerIndex(0);
+
     addEvent("session_start", {
       players: players.length,
       mode: config.mode,
       includeWildcards: config.includeWildcards,
       includeGoDeeper: config.includeGoDeeper,
+      useAIOnly: true,
+      questionCount,
+      theme,
     });
   };
 
@@ -101,13 +161,12 @@ export default function HomePage() {
   };
 
   const passCard = () => {
-    if (!currentCard) return;
-    // Pass: keep current card, but rotate to next player
     addEvent("card_passed", {
-      cardId: currentCard.id,
-      level: currentCard.level,
-      type: currentCard.type,
+      cardId: currentCard ? currentCard.id : null,
+      level: currentCard ? currentCard.level : null,
+      type: currentCard ? currentCard.type : null,
     });
+    // Treat pass / skip as "next player's turn"
     nextPlayer();
   };
 
@@ -128,8 +187,7 @@ export default function HomePage() {
                 <span className="text-brand-400"> — Friendsgiving Edition</span>
               </h1>
               <p className="text-sm sm:text-base text-slate-300 mt-1">
-                A consent-first intimacy game for adults 18+. One card at a
-                time.
+                An AI-powered, consent-first intimacy game for adults 18+. Fresh questions every round.
               </p>
             </div>
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-500/10 border border-brand-500/60 px-3 py-1 text-xs font-medium text-brand-100">
@@ -157,6 +215,10 @@ export default function HomePage() {
                 addEvent("config_change", { kind: "config_change", config: cfg });
               }}
               onStartGame={startGame}
+              questionCount={questionCount}
+              onQuestionCountChange={setQuestionCount}
+              theme={theme}
+              onThemeChange={setTheme}
             />
           )}
 
@@ -177,7 +239,9 @@ export default function HomePage() {
 
           <footer className="pt-4 border-t border-slate-800 mt-4">
             <p className="text-[11px] text-slate-500 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-              <span>For the culture of hapiness must reign... Hola 42</span>
+              <span>
+                Questions are generated live by AI with strict consent & safety rules. No explicit content.
+              </span>
               <span className="flex items-center gap-3">
                 <a
                   href="/multi"
@@ -204,9 +268,9 @@ export default function HomePage() {
             <ol className="mt-2 space-y-1 list-decimal list-inside text-slate-300">
               <li>Confirm age &amp; consent.</li>
               <li>Add player names.</li>
-              <li>Choose level and extras.</li>
+              <li>Choose level, number of questions, and theme.</li>
+              <li>Start game to generate a fresh AI deck.</li>
               <li>Draw a card, answer honestly — or pass.</li>
-              <li>Rotate turns, go at your pace.</li>
             </ol>
           </div>
 
@@ -223,7 +287,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-auto space-y-1 text-xs text-slate-500">
-            <p>Play only with people who respect your limits.</p>
+            <p>For the culture of hapiness must reign... Hola 42</p>
           </div>
         </aside>
       </div>

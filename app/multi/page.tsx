@@ -14,11 +14,12 @@ export default function MultiHomePage() {
   });
   const [hostName, setHostName] = useState("");
   const [joinRoomId, setJoinRoomId] = useState("");
+  const [questionCount, setQuestionCount] = useState<number>(20);
+  const [theme, setTheme] = useState<string>("");
 
   const createRoom = async () => {
-    if (creating) return;
-    if (!hostName.trim()) {
-      alert("Please enter your name to host the room.");
+    if (!questionCount || questionCount <= 0) {
+      alert("Choose at least 1 question for this room.");
       return;
     }
     setCreating(true);
@@ -26,7 +27,12 @@ export default function MultiHomePage() {
       const res = await fetch("/api/rooms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config, hostName }),
+        body: JSON.stringify({
+          config,
+          hostName,
+          questionCount,
+          theme,
+        }),
       });
       if (!res.ok) {
         alert("Failed to create room.");
@@ -59,6 +65,16 @@ export default function MultiHomePage() {
     setConfig((prev) => ({ ...prev, mode }));
   };
 
+  const handleQuestionCountChange = (value: string) => {
+    const n = parseInt(value, 10);
+    if (isNaN(n)) {
+      setQuestionCount(0);
+      return;
+    }
+    const clamped = Math.min(Math.max(n, 1), 80);
+    setQuestionCount(clamped);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl shadow-black/40 p-6 sm:p-8 space-y-6">
@@ -67,8 +83,8 @@ export default function MultiHomePage() {
             dümBuddy — Shared Deck
           </h1>
           <p className="text-sm text-slate-300">
-            Host a shared deck so everyone at the table can open the same game
-            on their phone. One host controls the cards, everyone plays.
+            Host a shared AI-powered deck so everyone at the table can open the
+            same game on their phone. One host controls the cards, everyone plays.
           </p>
         </header>
 
@@ -82,7 +98,7 @@ export default function MultiHomePage() {
               value={hostName}
               onChange={(e) => setHostName(e.target.value)}
               placeholder="Your name"
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
             <p className="text-xs text-slate-500">
               This name will appear as a player in the room so you don&apos;t
@@ -119,6 +135,45 @@ export default function MultiHomePage() {
                 );
               })}
             </div>
+            <p className="text-[11px] text-slate-500">
+              This tells the AI how deep to go emotionally: from playful to very
+              vulnerable.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
+                Number of questions
+              </h2>
+              <input
+                type="number"
+                min={1}
+                max={80}
+                value={questionCount}
+                onChange={(e) => handleQuestionCountChange(e.target.value)}
+                className="w-28 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+              />
+              <p className="text-[11px] text-slate-500">
+                Choose how many cards will be in this shared deck. 15–30 is a good start.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
+                Theme (optional)
+              </h2>
+              <input
+                type="text"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+                placeholder="e.g. playful, healing, long-term love"
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+              />
+              <p className="text-[11px] text-slate-500">
+                The AI will steer questions toward this mood while staying consent-first and non-explicit.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -137,7 +192,7 @@ export default function MultiHomePage() {
                 }
                 className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-brand-500 focus:ring-brand-500"
               />
-              <span>Include wildcards</span>
+              <span>Include wildcards (for future modes)</span>
             </label>
             <label className="flex items-center gap-2 text-xs">
               <input
@@ -159,9 +214,9 @@ export default function MultiHomePage() {
             type="button"
             onClick={createRoom}
             disabled={creating}
-            className="mt-1 inline-flex items-center justify-center rounded-2xl bg-brand-500 hover:bg-brand-400 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center rounded-2xl bg-brand-500 hover:bg-brand-400 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {creating ? "Creating room..." : "Create room & share link"}
+            {creating ? "Creating room..." : "Create shared room"}
           </button>
         </section>
 
@@ -179,7 +234,7 @@ export default function MultiHomePage() {
               value={joinRoomId}
               onChange={(e) => setJoinRoomId(e.target.value.toUpperCase())}
               placeholder="Room code (e.g. F7K3QZ)"
-              className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+              className="flex-1 bg-slate-950 border border-slate-700 rounded-2xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
             <button
               type="button"
